@@ -1,0 +1,29 @@
+#
+# MySQL environment on docker
+#
+
+version: '3'
+
+services:
+  # MySQL
+  db:
+    image: mysql:8.0
+    container_name: to_do_sample_container
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE:      to_do
+      MYSQL_USER:          docker
+      MYSQL_PASSWORD:      docker
+      TZ: 'Asia/Tokyo'
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+    - mysql-data:/var/lib/mysql
+    - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+    # 以下のコメントアウトを外して docker-compose up するとREADMEのテーブル作成を自動化できる (初回のみ)
+    #- ./docker/db/sql:/docker-entrypoint-initdb.d
+    ports:
+      - 33306:3306
+
+volumes:
+  mysql-data:
+    driver: local
