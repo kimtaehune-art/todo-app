@@ -1,8 +1,3 @@
-/**
-  * This is a sample of Todo Application.
-  *
-  */
-
 package lib.model
 
 import ixias.model._
