@@ -36,4 +36,23 @@ class TodoRepository @Inject() (
   def add(todo: Todo#WithNoId): Future[Todo.Id] = {
     master.run(todoTable returning todoTable.map(_.id) += todo.v)
   }
+
+  /**
+    * Get a single Todo by id (更新フォームの初期表示用). 読み取りは slave。
+    */
+  def get(id: Todo.Id): Future[Option[Todo]] = {
+    slave.run(todoTable.filter(_.id === id).result.headOption)
+  }
+
+  /**
+    * Update an existing Todo (更新). 更新できれば Some、対象が無ければ None。書き込みは master。
+    */
+  def update(entity: Todo#EmbeddedId): Future[Option[Todo#EmbeddedId]] = {
+    master.run {
+      todoTable.filter(_.id === entity.id).update(entity.v).map(_ > 0).map {
+        case true  => Some(entity)
+        case false => None
+      }
+    }
+  }
 }

@@ -42,7 +42,19 @@
 }
 
 .todo-card__meta {
-  margin-top: 8px;
+  margin-top:       8px;
+  display:          flex;
+  align-items:      center;
+  justify-content:  space-between;
+}
+
+.todo-card__edit {
+  font-size:        13px;
+  color:            #0969da;
+  text-decoration:  none;
+}
+.todo-card__edit:hover {
+  text-decoration: underline;
 }
 
 .category-badge {

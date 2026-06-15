@@ -22,6 +22,9 @@
                 style='background-color:@category.map(_.color.rgb).getOrElse("#999999")'>
             @category.map(_.name).getOrElse("カテゴリーなし")
           </span>
+          @todo.id.map { id =>
+            <a class="todo-card__edit" href="@routes.TodoController.edit(id)">編集</a>
+          }
         </div>
       </li>
     }

@@ -10,11 +10,21 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints
 
-// フォームが受け取る入力データ (status は含めない: 作成時は TODO 固定)
+import lib.model.Todo
+
+// 新規追加フォームの入力データ (status は含めない: 作成時は TODO 固定)
 case class TodoFormData(
   title:      String,
   body:       String,
   categoryId: Long,
+)
+
+// 更新フォームの入力データ (status も編集可能なので state を持つ)
+case class TodoEditFormData(
+  title:      String,
+  body:       String,
+  categoryId: Long,
+  state:      Short,
 )
 
 object TodoForm {
@@ -39,5 +49,21 @@ object TodoForm {
       ),
       "categoryId" -> longNumber,
     )(TodoFormData.apply)(TodoFormData.unapply)
+  )
+
+  // 更新フォーム: 新規追加の制約に加え、state(0/1/2 の有効な status code) を検証
+  val editForm: Form[TodoEditFormData] = Form(
+    mapping(
+      "title" -> nonEmptyText.verifying(
+        Constraints.pattern(titlePattern, "constraint.title", "error.title.format")
+      ),
+      "body" -> nonEmptyText.verifying(
+        Constraints.pattern(bodyPattern, "constraint.body", "error.body.format")
+      ),
+      "categoryId" -> longNumber,
+      "state" -> shortNumber.verifying(
+        "error.state.invalid", code => Todo.Status.values.exists(_.code == code)
+      ),
+    )(TodoEditFormData.apply)(TodoEditFormData.unapply)
   )
 }
