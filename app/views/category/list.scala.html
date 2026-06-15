@@ -8,6 +8,7 @@
 @common.Default(vv){
   <div class="category-list-header">
     <a class="btn btn--secondary" href="@routes.HomeController.index()">← ホーム</a>
+    <a class="btn btn--primary" href="@routes.CategoryController.register()">新規追加</a>
   </div>
   <ul class="category-list">
     @for(category <- vv.categories) {

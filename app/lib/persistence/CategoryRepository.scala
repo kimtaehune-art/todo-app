@@ -29,4 +29,11 @@ class CategoryRepository @Inject() (
   def getAll: Future[Seq[Category]] = {
     slave.run(categoryTable.result)
   }
+
+  /**
+    * Add a new Category (新規追加). 採番された id を返す。書き込みは master。
+    */
+  def add(category: Category#WithNoId): Future[Category.Id] = {
+    master.run(categoryTable returning categoryTable.map(_.id) += category.v)
+  }
 }

@@ -4,3 +4,8 @@
 error.title.format = タイトルに使用できない文字、または改行が含まれています。
 error.body.format  = 本文に使用できない文字が含まれています。
 error.state.invalid = 不正なステータスが指定されました。
+
+# Category フォームのバリデーションメッセージ
+error.name.format   = カテゴリー名に使用できない文字、または改行が含まれています。
+error.slug.format   = スラッグは英数字のみ使用できます。
+error.color.invalid = 不正なカラーが指定されました。
