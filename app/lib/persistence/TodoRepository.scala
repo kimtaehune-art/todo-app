@@ -17,7 +17,7 @@ import javax.inject._
 //~~~~~~~~~~~~~~~~~~~~~~
 @Singleton
 class TodoRepository @Inject() (
-  @Named("master") master: Database,
+  @Named("master") master: Database, // 書き込み用 (add/update/remove)。一覧の getAll は slave のみ使用
   @Named("slave") slave:   Database
 )(implicit val ec: ExecutionContext) extends SlickRepository[Todo.Id, Todo] {
 

@@ -8,6 +8,7 @@ package controllers
 
 import javax.inject._
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.util.control.NonFatal
 import play.api.mvc._
 
 import lib.persistence.{ TodoRepository, CategoryRepository }
@@ -26,7 +27,7 @@ class TodoController @Inject() (
     val todosFuture      = todoRepository.getAll
     val categoriesFuture = categoryRepository.getAll
 
-    for {
+    (for {
       todos      <- todosFuture
       categories <- categoriesFuture
     } yield {
@@ -41,6 +42,9 @@ class TodoController @Inject() (
         todos  = rows,
       )
       Ok(views.html.todo.list(vv))
+    }).recover {
+      // DB 取得失敗時に 500 をそのまま返さず、メッセージを表示する
+      case NonFatal(_) => InternalServerError("Todo一覧の取得に失敗しました")
     }
   }
 }

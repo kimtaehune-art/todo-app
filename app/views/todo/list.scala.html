@@ -11,7 +11,7 @@
       <li class="todo-card" style='border-left-color:@category.map(_.color.rgb).getOrElse("#cccccc")'>
         <div class="todo-card__head">
           <span class="todo-card__title">@todo.title</span>
-          <span class="status status--@todo.state.code">@todo.state.name</span>
+          <span class="status status--@todo.state">@todo.state.name</span>
         </div>
         <p class="todo-card__body">@todo.body</p>
         <div class="todo-card__meta">

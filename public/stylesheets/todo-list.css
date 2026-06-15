@@ -57,6 +57,6 @@
   font-size:      12px;
   font-weight:    bold;
 }
-.status--0 { background-color: #6a737d; } /* 着手前 */
-.status--1 { background-color: #d29922; } /* 進行中 */
-.status--2 { background-color: #2ea043; } /* 完了   */
+.status--TODO        { background-color: #6a737d; } /* 着手前 */
+.status--IN_PROGRESS { background-color: #d29922; } /* 進行中 */
+.status--COMPLETED   { background-color: #2ea043; } /* 完了   */
