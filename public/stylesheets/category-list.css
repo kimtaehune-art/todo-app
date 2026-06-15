@@ -1,0 +1,55 @@
+/**
+ * カテゴリー一覧ページ専用スタイル
+ */
+
+.category-list-header {
+  margin-bottom: 16px;
+}
+
+.category-list {
+  list-style:  none;
+  margin:      0;
+  padding:     0;
+}
+
+.category-card {
+  display:        flex;
+  align-items:    center;
+  gap:            14px;
+  border:         1px solid #e1e4e8;
+  border-radius:  6px;
+  padding:        14px 18px;
+  margin-bottom:  12px;
+  box-shadow:     0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* color.rgb を inline style で背景に入れる色見本 */
+.category-card__swatch {
+  width:          24px;
+  height:         24px;
+  border-radius:  4px;
+  border:         1px solid rgba(0, 0, 0, 0.1);
+  flex-shrink:    0;
+}
+
+.category-card__info {
+  display:         flex;
+  flex-direction:  column;
+  flex:            1;
+}
+
+.category-card__name {
+  font-size:    16px;
+  font-weight:  bold;
+}
+
+.category-card__slug {
+  font-size:    13px;
+  color:        #57606a;
+  font-family:  monospace;
+}
+
+.category-card__color {
+  font-size:  13px;
+  color:      #57606a;
+}

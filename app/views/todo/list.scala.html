@@ -7,6 +7,7 @@
 @(vv: model.ViewValueTodoList)(implicit request: RequestHeader)
 @common.Default(vv){
   <div class="todo-list-header">
+    <a class="btn btn--secondary" href="@routes.HomeController.index()">← ホーム</a>
     <a class="btn btn--primary" href="@routes.TodoController.register()">新規追加</a>
   </div>
   <ul class="todo-list">

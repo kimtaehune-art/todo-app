@@ -1,0 +1,24 @@
+@*
+ *
+ * to do sample project : カテゴリー一覧
+ *
+ *@
+
+@(vv: model.ViewValueCategoryList)
+@common.Default(vv){
+  <div class="category-list-header">
+    <a class="btn btn--secondary" href="@routes.HomeController.index()">← ホーム</a>
+  </div>
+  <ul class="category-list">
+    @for(category <- vv.categories) {
+      <li class="category-card">
+        <span class="category-card__swatch" style="background-color:@category.color.rgb"></span>
+        <div class="category-card__info">
+          <span class="category-card__name">@category.name</span>
+          <span class="category-card__slug">@category.slug</span>
+        </div>
+        <span class="category-card__color">@category.color.name</span>
+      </li>
+    }
+  </ul>
+}
