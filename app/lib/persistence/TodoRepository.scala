@@ -1,6 +1,5 @@
 /**
   * This is a sample of Todo Application.
-  *
   */
 
 package lib.persistence
@@ -19,7 +18,7 @@ import javax.inject._
 class TodoRepository @Inject() (
   @Named("master") master: Database, // 書き込み用 (add/update/remove)。一覧の getAll は slave のみ使用
   @Named("slave") slave:   Database
-)(implicit val ec: ExecutionContext) extends SlickRepository[Todo.Id, Todo] {
+)(implicit val ec:         ExecutionContext) extends SlickRepository[Todo.Id, Todo] {
 
   val todoTable = TableQuery[TodoTable]
 
@@ -52,6 +51,18 @@ class TodoRepository @Inject() (
       todoTable.filter(_.id === entity.id).update(entity.v).map(_ > 0).map {
         case true  => Some(entity)
         case false => None
+      }
+    }
+  }
+
+  /**
+    * Delete a Todo by id (削除). 削除できれば Some(id)、対象が無ければ None。書き込みは master。
+    */
+  def remove(id: Todo.Id): Future[Option[Todo.Id]] = {
+    master.run {
+      todoTable.filter(_.id === id).delete.map {
+        case 0 => None
+        case _ => Some(id)
       }
     }
   }

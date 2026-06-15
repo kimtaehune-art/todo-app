@@ -4,7 +4,7 @@
  *
  *@
 
-@(vv: model.ViewValueTodoList)
+@(vv: model.ViewValueTodoList)(implicit request: RequestHeader)
 @common.Default(vv){
   <div class="todo-list-header">
     <a class="btn btn--primary" href="@routes.TodoController.register()">新規追加</a>
@@ -23,10 +23,25 @@
             @category.map(_.name).getOrElse("カテゴリーなし")
           </span>
           @todo.id.map { id =>
-            <a class="todo-card__edit" href="@routes.TodoController.edit(id)">編集</a>
+            <span class="todo-card__actions">
+              <a class="todo-card__action todo-card__action--edit" href="@routes.TodoController.edit(id)">編集</a>
+              <form class="todo-card__delete-form js-delete-form" action="@routes.TodoController.delete(id)" method="post">
+                @helper.CSRF.formField
+                <button class="todo-card__action todo-card__action--delete" type="submit">削除</button>
+              </form>
+            </span>
           }
         </div>
       </li>
     }
   </ul>
+
+  @* 削除確認モーダル (todo-list.js が制御) *@
+  <dialog id="js-delete-dialog" class="modal">
+    <p class="modal__message">このTodoを削除しますか？</p>
+    <div class="modal__actions">
+      <button type="button" class="btn btn--secondary js-delete-cancel">キャンセル</button>
+      <button type="button" class="btn btn--danger js-delete-confirm">削除</button>
+    </div>
+  </dialog>
 }

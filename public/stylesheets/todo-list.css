@@ -48,13 +48,58 @@
   justify-content:  space-between;
 }
 
-.todo-card__edit {
-  font-size:        13px;
-  color:            #0969da;
-  text-decoration:  none;
+.todo-card__actions {
+  display:      flex;
+  align-items:  center;
+  gap:          8px;
 }
-.todo-card__edit:hover {
-  text-decoration: underline;
+
+.todo-card__delete-form {
+  margin:   0;
+  display:  inline;
+}
+
+/* 編集・削除 共通: 形は同じ、色だけ変える */
+.todo-card__action {
+  display:          inline-block;
+  padding:          3px 12px;
+  border-radius:    6px;
+  font-size:        13px;
+  font-weight:      bold;
+  line-height:      1.4;
+  text-decoration:  none;
+  border:           1px solid transparent;
+  cursor:           pointer;
+  font-family:      inherit;
+}
+.todo-card__action--edit {
+  background:  #ddf4ff;
+  color:       #0969da;
+}
+.todo-card__action--delete {
+  background:  #ffebe9;
+  color:       #cf222e;
+}
+
+/* 削除確認モーダル (<dialog>) */
+.modal {
+  border:         none;
+  border-radius:  8px;
+  padding:        24px;
+  max-width:      360px;
+  box-shadow:     0 8px 24px rgba(0, 0, 0, 0.2);
+}
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+.modal__message {
+  margin:     0 0 20px;
+  font-size:  15px;
+}
+.modal__actions {
+  display:          flex;
+  justify-content:  flex-end;
+  gap:              10px;
 }
 
 .category-badge {

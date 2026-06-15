@@ -41,7 +41,7 @@ class TodoController @Inject() (
       val vv = ViewValueTodoList(
         title  = "Todo一覧",
         cssSrc = Seq("main.css", "todo-list.css"),
-        jsSrc  = Seq("main.js"),
+        jsSrc  = Seq("main.js", "todo-list.js"),
         todos  = rows,
       )
       Ok(views.html.todo.list(vv))
@@ -134,6 +134,13 @@ class TodoController @Inject() (
             Future.successful(NotFound(s"Todo(id=$id) が見つかりません"))
         }
     )
+  }
+
+  // 削除処理 (remove → 一覧へ redirect。対象が無くても一覧へ戻す)
+  def delete(id: Long) = Action.async { implicit req =>
+    todoRepository.remove(Todo.Id(id)).map { _ =>
+      Redirect(routes.TodoController.list())
+    }
   }
 
   // edit 画面用 ViewValue を組み立てる小さなヘルパー (form の action 用に id を持つ)
