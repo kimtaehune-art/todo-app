@@ -29,4 +29,11 @@ class TodoRepository @Inject() (
   def getAll: Future[Seq[Todo]] = {
     slave.run(todoTable.result)
   }
+
+  /**
+    * Add a new Todo (新規追加). 採番された id を返す。書き込みは master。
+    */
+  def add(todo: Todo#WithNoId): Future[Todo.Id] = {
+    master.run(todoTable returning todoTable.map(_.id) += todo.v)
+  }
 }

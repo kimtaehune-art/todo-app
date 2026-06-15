@@ -6,6 +6,9 @@
 
 @(vv: model.ViewValueTodoList)
 @common.Default(vv){
+  <div class="todo-list-header">
+    <a class="btn btn--primary" href="@routes.TodoController.register()">新規追加</a>
+  </div>
   <ul class="todo-list">
     @for((todo, category) <- vv.todos) {
       <li class="todo-card" style='border-left-color:@category.map(_.color.rgb).getOrElse("#cccccc")'>

@@ -43,3 +43,27 @@ body {
 .info {
   display: none;
 }
+
+
+/******* 共通ボタン *******/
+.btn {
+  display:          inline-block;
+  padding:          8px 18px;
+  border-radius:    6px;
+  font-size:        14px;
+  font-weight:      bold;
+  text-decoration:  none;
+  cursor:           pointer;
+  border:           1px solid transparent;
+}
+
+.btn--primary {
+  background:  #2da44e;
+  color:       #ffffff;
+}
+
+.btn--secondary {
+  background:     #f6f8fa;
+  color:          #24292f;
+  border-color:   #d0d7de;
+}
