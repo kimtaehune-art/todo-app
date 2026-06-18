@@ -6,6 +6,9 @@
 # An example controller showing a sample home page
 GET     /                             controllers.HomeController.index()
 
+# ===== REST API (SPA フロント向け / JSON) =====
+GET     /api/todos                    controllers.api.TodoApiController.list()
+
 # Todo一覧表示
 GET     /todos                        controllers.TodoController.list()
 
