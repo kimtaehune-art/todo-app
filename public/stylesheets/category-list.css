@@ -56,12 +56,57 @@
   color:      #57606a;
 }
 
-.category-card__edit {
+.category-card__actions {
+  display:      flex;
+  align-items:  center;
+  gap:          8px;
+}
+
+.category-card__delete-form {
+  margin:   0;
+  display:  inline;
+}
+
+/* 編集・削除 共通の見た目 (色だけ違う) */
+.category-card__edit,
+.category-card__delete {
   font-size:        13px;
   font-weight:      bold;
   padding:          3px 12px;
   border-radius:    6px;
-  background:       #ddf4ff;
-  color:            #0969da;
   text-decoration:  none;
+  border:           1px solid transparent;
+  cursor:           pointer;
+  font-family:      inherit;
+  line-height:      1.4;
+}
+.category-card__edit {
+  background:  #ddf4ff;
+  color:       #0969da;
+}
+.category-card__delete {
+  background:  #ffebe9;
+  color:       #cf222e;
+}
+
+/* 削除確認モーダル (<dialog>) */
+.modal {
+  border:         none;
+  border-radius:  8px;
+  padding:        24px;
+  max-width:      380px;
+  box-shadow:     0 8px 24px rgba(0, 0, 0, 0.2);
+}
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+.modal__message {
+  margin:       0 0 20px;
+  font-size:    15px;
+  line-height:  1.6;
+}
+.modal__actions {
+  display:          flex;
+  justify-content:  flex-end;
+  gap:              10px;
 }

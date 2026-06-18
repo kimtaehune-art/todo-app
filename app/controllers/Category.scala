@@ -28,7 +28,7 @@ class CategoryController @Inject() (
       val vv = ViewValueCategoryList(
         title      = "カテゴリー一覧",
         cssSrc     = Seq("main.css", "category-list.css"),
-        jsSrc      = Seq("main.js"),
+        jsSrc      = Seq("main.js", "category-list.js"),
         categories = categories,
       )
       Ok(views.html.category.list(vv))
@@ -106,6 +106,13 @@ class CategoryController @Inject() (
             Future.successful(NotFound(s"Category(id=$id) が見つかりません"))
         }
     )
+  }
+
+  // 削除処理 (関連 Todo ごと削除 → 一覧へ redirect。対象が無くても一覧へ戻す)
+  def delete(id: Long) = Action.async { implicit req =>
+    categoryRepository.remove(Category.Id(id)).map { _ =>
+      Redirect(routes.CategoryController.list())
+    }
   }
 
   // edit 画面用 ViewValue (form の action 用に id を持つ。フォームは create と同じ CategoryForm を再利用)

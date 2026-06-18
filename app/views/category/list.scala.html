@@ -4,7 +4,7 @@
  *
  *@
 
-@(vv: model.ViewValueCategoryList)
+@(vv: model.ViewValueCategoryList)(implicit request: RequestHeader)
 @common.Default(vv){
   <div class="category-list-header">
     <a class="btn btn--secondary" href="@routes.HomeController.index()">← ホーム</a>
@@ -20,9 +20,24 @@
         </div>
         <span class="category-card__color">@category.color.name</span>
         @category.id.map { id =>
-          <a class="category-card__edit" href="@routes.CategoryController.edit(id)">編集</a>
+          <span class="category-card__actions">
+            <a class="category-card__edit" href="@routes.CategoryController.edit(id)">編集</a>
+            <form class="category-card__delete-form js-category-delete-form" action="@routes.CategoryController.delete(id)" method="post">
+              @helper.CSRF.formField
+              <button class="category-card__delete" type="submit">削除</button>
+            </form>
+          </span>
         }
       </li>
     }
   </ul>
+
+  @* 削除確認モーダル (category-list.js が制御) *@
+  <dialog id="js-category-delete-dialog" class="modal">
+    <p class="modal__message">このカテゴリーを削除しますか？<br>紐づく Todo もすべて削除されます。</p>
+    <div class="modal__actions">
+      <button type="button" class="btn btn--secondary js-delete-cancel">キャンセル</button>
+      <button type="button" class="btn btn--danger js-delete-confirm">削除</button>
+    </div>
+  </dialog>
 }

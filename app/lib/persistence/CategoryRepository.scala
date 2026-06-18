@@ -9,7 +9,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import ixias.slick.SlickRepository
 import ixias.slick.jdbc.MySQLProfile.api._
 import lib.model.Category
-import lib.persistence.db.CategoryTable
+import lib.persistence.db.{ CategoryTable, TodoTable }
 
 import javax.inject._
 
@@ -22,6 +22,7 @@ class CategoryRepository @Inject() (
 )(implicit val ec: ExecutionContext) extends SlickRepository[Category.Id, Category] {
 
   val categoryTable = TableQuery[CategoryTable]
+  val todoTable     = TableQuery[TodoTable]
 
   /**
     * Get all Category records (一覧表示用)
@@ -53,6 +54,22 @@ class CategoryRepository @Inject() (
         case true  => Some(entity)
         case false => None
       }
+    }
+  }
+
+  /**
+    * Delete a Category and its associated Todos (削除).
+    * 関連 Todo の削除とカテゴリーの削除を 1 トランザクションで実行する。
+    * 削除できれば Some(id)、対象が無ければ None。書き込みは master。
+    */
+  def remove(id: Category.Id): Future[Option[Category.Id]] = {
+    val action = (for {
+      _ <- todoTable.filter(_.categoryId === id).delete     // 関連 Todo を先に削除
+      n <- categoryTable.filter(_.id === id).delete          // カテゴリー本体を削除
+    } yield n).transactionally                               // 2つをまとめて1トランザクションに
+    master.run(action).map {
+      case 0 => None
+      case _ => Some(id)
     }
   }
 }
