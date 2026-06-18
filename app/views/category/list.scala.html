@@ -19,6 +19,9 @@
           <span class="category-card__slug">@category.slug</span>
         </div>
         <span class="category-card__color">@category.color.name</span>
+        @category.id.map { id =>
+          <a class="category-card__edit" href="@routes.CategoryController.edit(id)">編集</a>
+        }
       </li>
     }
   </ul>

@@ -36,4 +36,23 @@ class CategoryRepository @Inject() (
   def add(category: Category#WithNoId): Future[Category.Id] = {
     master.run(categoryTable returning categoryTable.map(_.id) += category.v)
   }
+
+  /**
+    * Get a single Category by id (更新フォームの初期表示用). 読み取りは slave。
+    */
+  def get(id: Category.Id): Future[Option[Category]] = {
+    slave.run(categoryTable.filter(_.id === id).result.headOption)
+  }
+
+  /**
+    * Update an existing Category (更新). 更新できれば Some、対象が無ければ None。書き込みは master。
+    */
+  def update(entity: Category#EmbeddedId): Future[Option[Category#EmbeddedId]] = {
+    master.run {
+      categoryTable.filter(_.id === entity.id).update(entity.v).map(_ > 0).map {
+        case true  => Some(entity)
+        case false => None
+      }
+    }
+  }
 }
