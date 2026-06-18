@@ -8,6 +8,8 @@ GET     /                             controllers.HomeController.index()
 
 # ===== REST API (SPA フロント向け / JSON) =====
 GET     /api/todos                    controllers.api.TodoApiController.list()
+POST    /api/todos                    controllers.api.TodoApiController.create()
+GET     /api/categories               controllers.api.CategoryApiController.list()
 
 # Todo一覧表示
 GET     /todos                        controllers.TodoController.list()
