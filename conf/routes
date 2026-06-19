@@ -14,6 +14,8 @@ PUT     /api/todos/:id                controllers.api.TodoApiController.update(i
 DELETE  /api/todos/:id                controllers.api.TodoApiController.delete(id: Long)
 GET     /api/statuses                 controllers.api.TodoApiController.statuses()
 GET     /api/categories               controllers.api.CategoryApiController.list()
+POST    /api/categories               controllers.api.CategoryApiController.create()
+GET     /api/colors                   controllers.api.CategoryApiController.colors()
 
 # Todo一覧表示
 GET     /todos                        controllers.TodoController.list()
