@@ -113,6 +113,14 @@ class TodoApiController @Inject() (
     )
   }
 
+  // DELETE /api/todos/:id : 削除。成功は 204、無ければ 404
+  def delete(id: Long) = Action.async { implicit req =>
+    todoRepository.remove(Todo.Id(id)).map {
+      case Some(_) => NoContent
+      case None    => NotFound(Json.obj("message" -> s"Todo(id=$id) が見つかりません"))
+    }
+  }
+
   // フォームエラーを { errors: [{ key, message }] } の JSON にする (どのフォームでも使える)
   private def errorsJson(form: Form[_])(implicit messages: Messages): JsValue =
     Json.obj(
