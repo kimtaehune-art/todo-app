@@ -9,6 +9,9 @@ GET     /                             controllers.HomeController.index()
 # ===== REST API (SPA フロント向け / JSON) =====
 GET     /api/todos                    controllers.api.TodoApiController.list()
 POST    /api/todos                    controllers.api.TodoApiController.create()
+GET     /api/todos/:id                controllers.api.TodoApiController.get(id: Long)
+PUT     /api/todos/:id                controllers.api.TodoApiController.update(id: Long)
+GET     /api/statuses                 controllers.api.TodoApiController.statuses()
 GET     /api/categories               controllers.api.CategoryApiController.list()
 
 # Todo一覧表示
