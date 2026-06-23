@@ -36,6 +36,14 @@ class CategoryApiController @Inject() (
     Ok(Json.toJson(Category.Color.values))
   }
 
+  // GET /api/categories/:id : 単一カテゴリーを返す。無ければ 404
+  def get(id: Long) = Action.async { implicit req =>
+    categoryRepository.get(Category.Id(id)).map {
+      case Some(category) => Ok(Json.toJson(category))
+      case None           => NotFound(Json.obj("message" -> s"Category(id=$id) が見つかりません"))
+    }
+  }
+
   // POST /api/categories : JSON 本文を検証して作成。201 で作成された Category を返す
   def create() = Action.async(parse.json) { implicit req =>
     // MPA と同じ CategoryForm を JSON にバインドして検証 (slug は英数字のみ等)
@@ -57,6 +65,32 @@ class CategoryApiController @Inject() (
           case None        => InternalServerError(Json.obj("message" -> "作成後の取得に失敗しました"))
         }
       }
+    )
+  }
+
+  // PUT /api/categories/:id : JSON で更新。read-modify-write で createdAt 保持。無ければ 404
+  def update(id: Long) = Action.async(parse.json) { implicit req =>
+    CategoryForm.form.bind(req.body).fold(
+      formWithErrors =>
+        Future.successful(BadRequest(errorsJson(formWithErrors))),
+      data =>
+        categoryRepository.get(Category.Id(id)).flatMap {
+          case Some(existing) =>
+            val updated = existing.copy(
+              name  = data.name,
+              slug  = data.slug,
+              color = Category.Color(data.color),
+            )
+            for {
+              _        <- categoryRepository.update(updated.toEmbeddedId)
+              savedOpt <- categoryRepository.get(Category.Id(id))
+            } yield savedOpt match {
+              case Some(saved) => Ok(Json.toJson(saved))
+              case None        => InternalServerError(Json.obj("message" -> "更新後の取得に失敗しました"))
+            }
+          case None =>
+            Future.successful(NotFound(Json.obj("message" -> s"Category(id=$id) が見つかりません")))
+        }
     )
   }
 
