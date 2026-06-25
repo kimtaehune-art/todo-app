@@ -94,6 +94,15 @@ class CategoryApiController @Inject() (
     )
   }
 
+  // DELETE /api/categories/:id : 削除。関連 Todo も一緒に削除される (Repository 側でトランザクション)。
+  // 成功は 204、無ければ 404
+  def delete(id: Long) = Action.async { implicit req =>
+    categoryRepository.remove(Category.Id(id)).map {
+      case Some(_) => NoContent
+      case None    => NotFound(Json.obj("message" -> s"Category(id=$id) が見つかりません"))
+    }
+  }
+
   // フォームエラーを { errors: [{ key, message }] } の JSON にする
   private def errorsJson(form: Form[_])(implicit messages: Messages): JsValue =
     Json.obj(

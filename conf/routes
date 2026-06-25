@@ -17,6 +17,7 @@ GET     /api/categories               controllers.api.CategoryApiController.list
 POST    /api/categories               controllers.api.CategoryApiController.create()
 GET     /api/categories/:id           controllers.api.CategoryApiController.get(id: Long)
 PUT     /api/categories/:id           controllers.api.CategoryApiController.update(id: Long)
+DELETE  /api/categories/:id           controllers.api.CategoryApiController.delete(id: Long)
 GET     /api/colors                   controllers.api.CategoryApiController.colors()
 
 # Todo一覧表示
