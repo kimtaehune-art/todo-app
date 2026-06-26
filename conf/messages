@@ -1,1 +1,5 @@
 # https://www.playframework.com/documentation/latest/ScalaI18N
+
+# Todo フォームのバリデーションメッセージ
+error.title.format = タイトルに使用できない文字、または改行が含まれています。
+error.body.format  = 本文に使用できない文字が含まれています。
