@@ -25,17 +25,11 @@ class TodoApiController @Inject() (
   categoryRepository:       CategoryRepository,
 )(implicit ec: ExecutionContext) extends BaseController with I18nSupport {
 
-  // GET /api/todos : 全 Todo を category 埋め込みで JSON 返却
+  // GET /api/todos : 全 Todo を category 埋め込みで JSON 返却。
+  // JOIN で 1 クエリにまとめて取得し、N+1 / 全件突き合わせを避ける。
   def list() = Action.async { implicit req =>
-    val todosFuture      = todoRepository.getAll
-    val categoriesFuture = categoryRepository.getAll
-    for {
-      todos      <- todosFuture
-      categories <- categoriesFuture
-    } yield {
-      val categoryMap = categories.flatMap(c => c.id.map(_ -> c)).toMap
-      val rows        = todos.flatMap(t => categoryMap.get(t.categoryId).map(c => TodoWithCategory(t, c)))
-      Ok(Json.toJson(rows))
+    todoRepository.getAllWithCategory.map { rows =>
+      Ok(Json.toJson(rows.map { case (todo, category) => TodoWithCategory(todo, category) }))
     }
   }
 
@@ -64,7 +58,7 @@ class TodoApiController @Inject() (
           catOpt   <- categoryRepository.get(Category.Id(data.categoryId))
         } yield (savedOpt, catOpt) match {
           case (Some(saved), Some(cat)) => Created(Json.toJson(TodoWithCategory(saved, cat)))
-          case _                        => InternalServerError(Json.obj("message" -> "作成後の取得に失敗しました"))
+          case _                        => InternalServerError(messageJson("error.fetchAfterCreate"))
         }
       }
     )
@@ -77,10 +71,10 @@ class TodoApiController @Inject() (
       case Some(todo) =>
         categoryRepository.get(todo.categoryId).map {
           case Some(cat) => Ok(Json.toJson(TodoWithCategory(todo, cat)))
-          case None      => NotFound(Json.obj("message" -> "category not found"))
+          case None      => NotFound(messageJson("error.todo.categoryMissing"))
         }
       case None =>
-        Future.successful(NotFound(Json.obj("message" -> s"Todo(id=$id) が見つかりません")))
+        Future.successful(NotFound(messageJson("error.todo.notFound", id)))
     }
   }
 
@@ -105,10 +99,10 @@ class TodoApiController @Inject() (
               catOpt   <- categoryRepository.get(Category.Id(data.categoryId))
             } yield (savedOpt, catOpt) match {
               case (Some(saved), Some(cat)) => Ok(Json.toJson(TodoWithCategory(saved, cat)))
-              case _                        => InternalServerError(Json.obj("message" -> "更新後の取得に失敗しました"))
+              case _                        => InternalServerError(messageJson("error.fetchAfterUpdate"))
             }
           case None =>
-            Future.successful(NotFound(Json.obj("message" -> s"Todo(id=$id) が見つかりません")))
+            Future.successful(NotFound(messageJson("error.todo.notFound", id)))
         }
     )
   }
@@ -117,7 +111,7 @@ class TodoApiController @Inject() (
   def delete(id: Long) = Action.async { implicit req =>
     todoRepository.remove(Todo.Id(id)).map {
       case Some(_) => NoContent
-      case None    => NotFound(Json.obj("message" -> s"Todo(id=$id) が見つかりません"))
+      case None    => NotFound(messageJson("error.todo.notFound", id))
     }
   }
 
@@ -126,4 +120,8 @@ class TodoApiController @Inject() (
     Json.obj(
       "errors" -> form.errors.map(e => Json.obj("key" -> e.key, "message" -> messages(e.message, e.args: _*))),
     )
+
+  // メッセージキーを i18n 解決して { message } の JSON にする
+  private def messageJson(key: String, args: Any*)(implicit messages: Messages): JsValue =
+    Json.obj("message" -> messages(key, args: _*))
 }

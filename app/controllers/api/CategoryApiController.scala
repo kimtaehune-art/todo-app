@@ -40,7 +40,7 @@ class CategoryApiController @Inject() (
   def get(id: Long) = Action.async { implicit req =>
     categoryRepository.get(Category.Id(id)).map {
       case Some(category) => Ok(Json.toJson(category))
-      case None           => NotFound(Json.obj("message" -> s"Category(id=$id) が見つかりません"))
+      case None           => NotFound(messageJson("error.category.notFound", id))
     }
   }
 
@@ -62,7 +62,7 @@ class CategoryApiController @Inject() (
           savedOpt <- categoryRepository.get(newId)
         } yield savedOpt match {
           case Some(saved) => Created(Json.toJson(saved))
-          case None        => InternalServerError(Json.obj("message" -> "作成後の取得に失敗しました"))
+          case None        => InternalServerError(messageJson("error.fetchAfterCreate"))
         }
       }
     )
@@ -86,10 +86,10 @@ class CategoryApiController @Inject() (
               savedOpt <- categoryRepository.get(Category.Id(id))
             } yield savedOpt match {
               case Some(saved) => Ok(Json.toJson(saved))
-              case None        => InternalServerError(Json.obj("message" -> "更新後の取得に失敗しました"))
+              case None        => InternalServerError(messageJson("error.fetchAfterUpdate"))
             }
           case None =>
-            Future.successful(NotFound(Json.obj("message" -> s"Category(id=$id) が見つかりません")))
+            Future.successful(NotFound(messageJson("error.category.notFound", id)))
         }
     )
   }
@@ -99,7 +99,7 @@ class CategoryApiController @Inject() (
   def delete(id: Long) = Action.async { implicit req =>
     categoryRepository.remove(Category.Id(id)).map {
       case Some(_) => NoContent
-      case None    => NotFound(Json.obj("message" -> s"Category(id=$id) が見つかりません"))
+      case None    => NotFound(messageJson("error.category.notFound", id))
     }
   }
 
@@ -108,4 +108,8 @@ class CategoryApiController @Inject() (
     Json.obj(
       "errors" -> form.errors.map(e => Json.obj("key" -> e.key, "message" -> messages(e.message, e.args: _*))),
     )
+
+  // メッセージキーを i18n 解決して { message } の JSON にする
+  private def messageJson(key: String, args: Any*)(implicit messages: Messages): JsValue =
+    Json.obj("message" -> messages(key, args: _*))
 }

@@ -7,8 +7,8 @@ package lib.persistence
 import scala.concurrent.{ ExecutionContext, Future }
 import ixias.slick.SlickRepository
 import ixias.slick.jdbc.MySQLProfile.api._
-import lib.model.Todo
-import lib.persistence.db.TodoTable
+import lib.model.{ Todo, Category }
+import lib.persistence.db.{ TodoTable, CategoryTable }
 
 import javax.inject._
 
@@ -20,13 +20,24 @@ class TodoRepository @Inject() (
   @Named("slave") slave:   Database
 )(implicit val ec:         ExecutionContext) extends SlickRepository[Todo.Id, Todo] {
 
-  val todoTable = TableQuery[TodoTable]
+  val todoTable     = TableQuery[TodoTable]
+  val categoryTable = TableQuery[CategoryTable]
 
   /**
     * Get all Todo records (一覧表示用)
     */
   def getAll: Future[Seq[Todo]] = {
     slave.run(todoTable.result)
+  }
+
+  /**
+    * Get all Todo records with their Category (一覧表示用).
+    * Todo ごとに Category を引き直す代わりに JOIN で 1 クエリにまとめ、N+1 を避ける。
+    * (内部結合のため、対応する Category が無い Todo は結果に含まれない)
+    */
+  def getAllWithCategory: Future[Seq[(Todo, Category)]] = {
+    val query = todoTable join categoryTable on (_.categoryId === _.id)
+    slave.run(query.result)
   }
 
   /**
