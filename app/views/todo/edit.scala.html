@@ -1,0 +1,57 @@
+@*
+ *
+ * to do sample project : Todo 編集
+ *
+ *@
+
+@(vv: model.ViewValueTodoEdit, form: Form[forms.TodoEditFormData])(implicit request: RequestHeader, messages: Messages)
+@common.Default(vv){
+  <form action="@routes.TodoController.update(vv.id)" method="post" class="todo-form">
+    @* CSRF 対策トークン *@
+    @helper.CSRF.formField
+
+    <div class="form-group @if(form("title").hasErrors){is-error}">
+      <label class="form-label" for="title">Title</label>
+      <input class="form-control" type="text" id="title" name="title" value="@form("title").value.getOrElse("")">
+      @form("title").errors.map { error =>
+        <p class="form-error">@messages(error.message)</p>
+      }
+    </div>
+
+    <div class="form-group @if(form("body").hasErrors){is-error}">
+      <label class="form-label" for="body">Body</label>
+      <textarea class="form-control" id="body" name="body" rows="5">@form("body").value.getOrElse("")</textarea>
+      @form("body").errors.map { error =>
+        <p class="form-error">@messages(error.message)</p>
+      }
+    </div>
+
+    <div class="form-group @if(form("state").hasErrors){is-error}">
+      <label class="form-label" for="state">Status</label>
+      <select class="form-control" id="state" name="state">
+        @for(st <- lib.model.Todo.Status.values) {
+          <option value="@st.code" @if(form("state").value.contains(st.code.toString)){selected}>@st.name</option>
+        }
+      </select>
+      @form("state").errors.map { error =>
+        <p class="form-error">@messages(error.message)</p>
+      }
+    </div>
+
+    <div class="form-group @if(form("categoryId").hasErrors){is-error}">
+      <label class="form-label" for="categoryId">Category</label>
+      <select class="form-control" id="categoryId" name="categoryId">
+        @for(category <- vv.categories) {
+          @defining(category.id.map(_.toString).getOrElse("")) { value =>
+            <option value="@value" @if(form("categoryId").value.contains(value)){selected}>@category.name</option>
+          }
+        }
+      </select>
+    </div>
+
+    <div class="form-actions">
+      <a class="btn btn--secondary" href="@routes.TodoController.list()">キャンセル</a>
+      <button class="btn btn--primary" type="submit">更新</button>
+    </div>
+  </form>
+}

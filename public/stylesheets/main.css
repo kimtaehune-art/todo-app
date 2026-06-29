@@ -67,3 +67,8 @@ body {
   color:          #24292f;
   border-color:   #d0d7de;
 }
+
+.btn--danger {
+  background:  #cf222e;
+  color:       #ffffff;
+}

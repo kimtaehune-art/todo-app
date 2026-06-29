@@ -1,0 +1,49 @@
+@*
+ *
+ * to do sample project : カテゴリー新規追加
+ *
+ *@
+
+@(vv: model.ViewValueCategoryCreate, form: Form[forms.CategoryFormData])(implicit request: RequestHeader, messages: Messages)
+@common.Default(vv){
+  <form action="@routes.CategoryController.create()" method="post" class="category-form">
+    @helper.CSRF.formField
+
+    <div class="form-group @if(form("name").hasErrors){is-error}">
+      <label class="form-label" for="name">Name</label>
+      <input class="form-control" type="text" id="name" name="name" value="@form("name").value.getOrElse("")">
+      @form("name").errors.map { error =>
+        <p class="form-error">@messages(error.message)</p>
+      }
+    </div>
+
+    <div class="form-group @if(form("slug").hasErrors){is-error}">
+      <label class="form-label" for="slug">Slug</label>
+      <input class="form-control" type="text" id="slug" name="slug" value="@form("slug").value.getOrElse("")">
+      <p class="form-hint">英数字のみ</p>
+      @form("slug").errors.map { error =>
+        <p class="form-error">@messages(error.message)</p>
+      }
+    </div>
+
+    <div class="form-group @if(form("color").hasErrors){is-error}">
+      <label class="form-label" for="color">Color</label>
+      <div class="color-field">
+        <span class="color-preview js-color-preview"></span>
+        <select class="form-control js-color-select" id="color" name="color">
+          @for(color <- lib.model.Category.Color.values) {
+            <option value="@color.code" data-rgb="@color.rgb" @if(form("color").value.contains(color.code.toString)){selected}>@color.name</option>
+          }
+        </select>
+      </div>
+      @form("color").errors.map { error =>
+        <p class="form-error">@messages(error.message)</p>
+      }
+    </div>
+
+    <div class="form-actions">
+      <a class="btn btn--secondary" href="@routes.CategoryController.list()">キャンセル</a>
+      <button class="btn btn--primary" type="submit">追加</button>
+    </div>
+  </form>
+}

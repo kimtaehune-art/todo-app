@@ -7,15 +7,15 @@
 package controllers
 
 import javax.inject._
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.control.NonFatal
 import play.api.mvc._
 import play.api.i18n.I18nSupport
 
 import lib.persistence.{ TodoRepository, CategoryRepository }
 import lib.model.{ Todo, Category }
-import forms.TodoForm
-import model.{ ViewValueTodoList, ViewValueTodoCreate }
+import forms.{ TodoForm, TodoEditFormData }
+import model.{ ViewValueTodoList, ViewValueTodoCreate, ViewValueTodoEdit }
 
 @Singleton
 class TodoController @Inject() (
@@ -41,7 +41,7 @@ class TodoController @Inject() (
       val vv = ViewValueTodoList(
         title  = "Todo一覧",
         cssSrc = Seq("main.css", "todo-list.css"),
-        jsSrc  = Seq("main.js"),
+        jsSrc  = Seq("main.js", "todo-list.js"),
         todos  = rows,
       )
       Ok(views.html.todo.list(vv))
@@ -88,6 +88,68 @@ class TodoController @Inject() (
       title      = "Todo 新規追加",
       cssSrc     = Seq("main.css", "todo-form.css"),
       jsSrc      = Seq("main.js"),
+      categories = categories,
+    )
+
+  // 更新フォームの表示 (既存データで fill。対象が無ければ 404)
+  def edit(id: Long) = Action.async { implicit req =>
+    val todoId           = Todo.Id(id)
+    val todoFuture       = todoRepository.get(todoId)
+    val categoriesFuture = categoryRepository.getAll
+    for {
+      todoOpt    <- todoFuture
+      categories <- categoriesFuture
+    } yield todoOpt match {
+      case Some(todo) =>
+        val filled = TodoForm.editForm.fill(
+          TodoEditFormData(todo.title, todo.body, todo.categoryId, todo.state.code)
+        )
+        Ok(views.html.todo.edit(editViewValue(id, categories), filled))
+      case None =>
+        NotFound(s"Todo(id=$id) が見つかりません")
+    }
+  }
+
+  // 更新処理 (read-modify-write: 既存を取得し、編集対象フィールドだけ差し替えて保存)
+  def update(id: Long) = Action.async { implicit req =>
+    val todoId = Todo.Id(id)
+    TodoForm.editForm.bindFromRequest().fold(
+      formWithErrors =>
+        categoryRepository.getAll.map { categories =>
+          BadRequest(views.html.todo.edit(editViewValue(id, categories), formWithErrors))
+        },
+      data =>
+        todoRepository.get(todoId).flatMap {
+          case Some(existing) =>
+            val updated = existing.copy(
+              categoryId = Category.Id(data.categoryId),
+              title      = data.title,
+              body       = data.body,
+              state      = Todo.Status(data.state),
+            )
+            todoRepository.update(updated.toEmbeddedId).map { _ =>
+              Redirect(routes.TodoController.list())
+            }
+          case None =>
+            Future.successful(NotFound(s"Todo(id=$id) が見つかりません"))
+        }
+    )
+  }
+
+  // 削除処理 (remove → 一覧へ redirect。対象が無くても一覧へ戻す)
+  def delete(id: Long) = Action.async { implicit req =>
+    todoRepository.remove(Todo.Id(id)).map { _ =>
+      Redirect(routes.TodoController.list())
+    }
+  }
+
+  // edit 画面用 ViewValue を組み立てる小さなヘルパー (form の action 用に id を持つ)
+  private def editViewValue(id: Long, categories: Seq[Category]): ViewValueTodoEdit =
+    ViewValueTodoEdit(
+      title      = "Todo 編集",
+      cssSrc     = Seq("main.css", "todo-form.css"),
+      jsSrc      = Seq("main.js"),
+      id         = id,
       categories = categories,
     )
 }

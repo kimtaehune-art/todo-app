@@ -3,3 +3,16 @@
 # Todo フォームのバリデーションメッセージ
 error.title.format = タイトルに使用できない文字、または改行が含まれています。
 error.body.format  = 本文に使用できない文字が含まれています。
+error.state.invalid = 不正なステータスが指定されました。
+
+# Category フォームのバリデーションメッセージ
+error.name.format   = カテゴリー名に使用できない文字、または改行が含まれています。
+error.slug.format   = スラッグは英数字のみ使用できます。
+error.color.invalid = 不正なカラーが指定されました。
+
+# REST API のエラーメッセージ ({0} は id 等の引数)
+error.todo.notFound        = Todo(id={0})が見つかりません。
+error.category.notFound    = Category(id={0})が見つかりません。
+error.todo.categoryMissing = Todoに紐づくカテゴリーが見つかりません。
+error.fetchAfterCreate     = 作成後の取得に失敗しました。
+error.fetchAfterUpdate     = 更新後の取得に失敗しました。
